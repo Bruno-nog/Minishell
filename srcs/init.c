@@ -1,18 +1,15 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   minishel.h                                         :+:      :+:    :+:   */
+/*   init.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: brunogue <brunogue@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pvitor-l <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/22 14:42:09 by brunogue          #+#    #+#             */
-/*   Updated: 2025/05/22 14:43:02 by brunogue         ###   ########.fr       */
+/*   Created: 2025/05/26 16:29:34 by pvitor-l          #+#    #+#             */
+/*   Updated: 2025/05/26 18:22:58 by pvitor-l         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MINISHELL_H
-#define MINISHELL_H
+# include "minishell.h"
 
-#include <unistd.h>
-
-#endif
+// this file will used for initlized all struct this is project or amost all 
