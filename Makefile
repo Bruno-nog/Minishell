@@ -6,7 +6,7 @@
 #    By: brunogue <brunogue@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/21 20:04:53 by pvitor-l          #+#    #+#              #
-#    Updated: 2025/06/02 15:30:36 by brunogue         ###   ########.fr        #
+#    Updated: 2025/06/04 16:16:33 by brunogue         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -49,7 +49,7 @@ fclean: clean
 	@make -C $(LIBFT_DIR) fclean
 
 valgrind:
-	$(VALGRIND) ./$(NAME)
+	-$(VALGRIND) ./$(NAME)
 
 re: fclean all 
 

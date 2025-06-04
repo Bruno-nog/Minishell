@@ -6,7 +6,7 @@
 /*   By: brunogue <brunogue@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/22 19:04:01 by brunogue          #+#    #+#             */
-/*   Updated: 2025/06/02 20:01:34 by brunogue         ###   ########.fr       */
+/*   Updated: 2025/06/04 16:15:35 by brunogue         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,11 @@
 
 int	main(void)
 {
+	t_token		*token;
     t_token 	*token_list;
 	char		*input;
 
+	token = NULL;
 	while (1)
 	{
 		input = readline("minishell> ");
@@ -28,9 +30,8 @@ int	main(void)
 			return (1);
 		}
         add_history(input);
-        token_list = tokenization(input);
+        token_list = tokenization(token, input);
         valid_pipe(token_list);
-		ft_printf("%s\n", input);
         ft_print_token(token_list);
 		free_token_list(token_list);
         free(input);
