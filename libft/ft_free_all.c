@@ -1,15 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   init.c                                             :+:      :+:    :+:   */
+/*   ft_free_all.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pvitor-l <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: brunogue <brunogue@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/26 16:29:34 by pvitor-l          #+#    #+#             */
-/*   Updated: 2025/05/26 18:22:58 by pvitor-l         ###   ########.fr       */
+/*   Created: 2025/06/02 20:03:07 by pvitor-l          #+#    #+#             */
+/*   Updated: 2025/06/09 13:38:10 by brunogue         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "libft.h"
 
-// this file will used for initlized all struct this is project or amost all
+void	free_all(char **matrix)
+{
+	int	i;
+
+	if (!matrix)
+		return ;
+	i = 0;
+	while (matrix[i] != NULL)
+	{
+		free(matrix[i]);
+		i++;
+	}
+	free(matrix);
+}
