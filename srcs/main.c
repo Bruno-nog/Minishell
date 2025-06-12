@@ -6,7 +6,7 @@
 /*   By: brunogue <brunogue@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/22 19:04:01 by brunogue          #+#    #+#             */
-/*   Updated: 2025/06/10 17:47:40 by brunogue         ###   ########.fr       */
+/*   Updated: 2025/06/12 18:51:03 by brunogue         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,43 +14,40 @@
 
 int	main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[], char *envp[])
 {
-	t_token	*token;
-	t_token	*token_list;
-	t_cmd	*cmd;
-	char	*input;
-	t_env	*env_copy;
-	char	**path;
+	t_shell	*sh;
 
-	(void)argc;
-	(void)argv;
-	token = NULL;
-	(void)path;
-	env_copy = linked_node_env(envp);
+	sh = malloc(sizeof(t_shell));
+	if (!sh)
+		return (1);
+	sh->env = linked_node_env(envp);
+	sh->cmd = NULL;
+	sh->token = NULL;
+	sh->input = NULL;
 	while (1)
 	{
-		input = readline("minishell> ");
-		if (!check_quotes(input))
-			ft_printf("nao contem um numero par de aspas: %s\n", input);
-		if (!ft_strcmp(input, "exit"))
+		sh->input = readline("minishell> ");
+		if (!sh->input || !*sh->input)
 		{
-			free(input);
-			free_env(env_copy);
-			return (1);
+			free(sh->input);
+			continue;
 		}
-		add_history(input);
-		token_list = tokenization(token, input);
-		valid_pipe(token_list);
-		valid_redir_in(token_list);
-		valid_redir_out(token_list);
-		valid_heredoc(token_list);
-		cmd = token_to_cmd(token_list);
-		//execution_cmd(env_copy, cmd);
-		exec_builtin(cmd, env_copy);
-		ft_printf("asffsd %s\n", get_env_value(env_copy, "OLDPWD"));
-		ft_print_token(token_list);
-		free_token_list(token_list);
-		free_cmd(cmd);
-		free(input);
+		if (!check_quotes(sh->input))
+			ft_printf("nao contem um numero par de aspas: %s\n", sh->input);
+		add_history(sh->input);
+		sh->token = tokenization(sh->token, sh->input);
+		valid_pipe(sh->token);
+		valid_redir_in(sh->token);
+		valid_redir_out(sh->token);
+		valid_heredoc(sh->token);
+		token_to_cmd(sh);
+		execution_cmd(sh);
+		ft_print_token(sh->token);
+		free_token_list(sh->token);
+		free_cmd(sh->cmd);
+		free(sh->input);
+		sh->token = NULL;
+		sh->cmd = NULL;
+		sh->input = NULL;
 	}
 	return (0);
 }
