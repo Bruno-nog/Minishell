@@ -6,7 +6,7 @@
 /*   By: brunogue <brunogue@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 13:23:24 by pvitor-l          #+#    #+#             */
-/*   Updated: 2025/06/12 18:50:55 by brunogue         ###   ########.fr       */
+/*   Updated: 2025/06/23 14:55:06 by brunogue         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,35 +51,8 @@ char	**recreate_env(t_env *env)
 		curr_env = curr_env->next;
 		i++;
 	}
+    env_array[i] = NULL;
 	return (env_array);
-}
-
-void	execution_cmd(t_shell *sh)
-{
-	char	*abs_path;
-	char	**new_envp;
-	int		status;
-	int		pid;
-
-	status = 0;
-	if (sh->cmd == NULL)
-		return ;
-	else if (exec_builtin(sh) != -1)
-		return ;
-	pid = fork();
-	if (pid == 0)
-	{
-		new_envp = recreate_env(sh->env);
-		abs_path = join_path_with_cmd(find_path(sh->env), sh->cmd);
-		if (execve(abs_path, sh->cmd->args, new_envp) == -1)
-		{
-			free_all(new_envp);
-			perror("Error in execute command");
-			exit(127);
-		}
-	}
-	if (pid > 0)
-		waitpid(pid, &status, 0);
 }
 
 char	*join_path_with_cmd(char **path, t_cmd *cmd)
@@ -112,8 +85,9 @@ char	**find_path(t_env *env)
 	current_node = env;
 	if (!current_node)
 		return (NULL);
-	while (current_node && current_node->name && ft_strcmp(current_node->name, "PATH"))
-		current_node = current_node->next;
+	while (current_node && current_node->name && ft_strcmp(current_node->name,
+			"PATH"))
+	current_node = current_node->next;
 	if (current_node == NULL)
 		return (NULL);
 	path = ft_split(current_node->content, ':');
