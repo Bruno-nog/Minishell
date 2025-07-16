@@ -53,4 +53,11 @@ brunogue - objs organizados e variavel de ambiente concluida, somente faltando o
 ex: echo $$$HOME 
 
 24/6
-brunogue - fazer o cd ~ e echo $? 
+brunogue - fazer o cd ~ e echo $?
+
+26/6
+brunogue - expansao de variavel de ambiente corretas, agr fazer o exit status
+
+3/7
+brunogue - arrumei os still reachables restantes e o exit status que tinha parado de funcionar, so que agr o unico problema é o pipe que ta dando double free. 
+fazer aspas no value do export

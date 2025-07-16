@@ -6,7 +6,7 @@
 #    By: brunogue <brunogue@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/21 20:04:53 by pvitor-l          #+#    #+#              #
-#    Updated: 2025/06/23 14:53:58 by brunogue         ###   ########.fr        #
+#    Updated: 2025/07/15 15:38:12 by brunogue         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,19 +23,32 @@ LIBFT = $(LIBFT_DIR)/libft.a
 INCLUDES = -I$(INCLUDES_DIR)
 FILES = $(SRC_DIR)/main.c \
 		$(SRC_DIR)/free.c \
-		$(SRC_DIR)/parser.c \
-		$(SRC_DIR)/token.c \
+		$(SRC_DIR)/parser/parser.c \
+		$(SRC_DIR)/token/token.c \
+		$(SRC_DIR)/token/token_utils.c \
 		$(SRC_DIR)/built-in/exec_builtin.c \
 		$(SRC_DIR)/built-in/pwd.c \
 		$(SRC_DIR)/built-in/cd.c \
 		$(SRC_DIR)/built-in/echo.c \
 		$(SRC_DIR)/built-in/env.c \
 		$(SRC_DIR)/built-in/exit.c \
-		$(SRC_DIR)/environment.c \
-		$(SRC_DIR)/execution.c \
-		$(SRC_DIR)/global_execute.c \
+		$(SRC_DIR)/built-in/unset.c \
+		$(SRC_DIR)/built-in/export/export.c \
+		$(SRC_DIR)/built-in/export/export_utils.c \
+		$(SRC_DIR)/built-in/export/valid_export.c \
+		$(SRC_DIR)/expand/environment.c \
+		$(SRC_DIR)/execution/execution.c \
+		$(SRC_DIR)/execution/global_execute.c \
+		$(SRC_DIR)/execution/command.c \
 		$(SRC_DIR)/utils.c \
-		$(SRC_DIR)/pipe.c 
+		$(SRC_DIR)/execution/pipe.c \
+		$(SRC_DIR)/execution/smart_execute.c \
+		$(SRC_DIR)/redirect/valid_all.c \
+		$(SRC_DIR)/redirect/redirect.c \
+		$(SRC_DIR)/redirect/redirect_utils.c \
+		$(SRC_DIR)/expand/expand.c \
+		$(SRC_DIR)/signals.c
+		
 
 VALGRIND = valgrind --leak-check=full \
 	--show-leak-kinds=all \

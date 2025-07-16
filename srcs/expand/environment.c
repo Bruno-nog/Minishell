@@ -6,7 +6,7 @@
 /*   By: brunogue <brunogue@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 20:03:07 by pvitor-l          #+#    #+#             */
-/*   Updated: 2025/06/23 14:54:18 by brunogue         ###   ########.fr       */
+/*   Updated: 2025/07/04 19:03:07 by pvitor-l         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 char	*get_env_name(char *env)
 {
-	char	*environment_variable_name;
+	char	*env_var_name;
 	int		i;
 	int		len;
 
@@ -23,32 +23,27 @@ char	*get_env_name(char *env)
 	if (env == NULL)
 		return (NULL);
 	while (env[len] && env[len] != '=')
-        len++;
+		len++;
 	if (env[len] != '=')
 		return (NULL);
-	environment_variable_name = malloc((len + 1) * sizeof(char));
-	if (!environment_variable_name)
+	env_var_name = malloc((len + 1) * sizeof(char));
+	if (!env_var_name)
 		return (NULL);
 	while (env[i] && env[i] != '=')
 	{
-		environment_variable_name[i] = env[i];
+		env_var_name[i] = env[i];
 		i++;
 	}
-	environment_variable_name[i] = '\0';
-	return (environment_variable_name);
+	env_var_name[i] = '\0';
+	return (env_var_name);
 }
 
 char	*get_env_value(t_env *env, char *name)
 {
-
-//	int		i;
-// 	int		len;
 	t_env	*temp;
 
 	if (name == NULL)
 		return (NULL);
-//	i = 0;
-// len = 0;
 	temp = env;
 	while (temp)
 	{
@@ -71,7 +66,7 @@ t_env	*create_node_env(char *name, char *content)
 	if (name)
 		node->name = ft_strdup(name);
 	if (content)
-        node->content = ft_strdup(content);
+		node->content = ft_strdup(content);
 	node->next = NULL;
 	return (node);
 }

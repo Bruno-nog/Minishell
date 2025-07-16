@@ -6,131 +6,77 @@
 /*   By: brunogue <brunogue@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/05 14:36:05 by brunogue          #+#    #+#             */
-/*   Updated: 2025/06/23 14:52:27 by brunogue         ###   ########.fr       */
+/*   Updated: 2025/07/15 19:22:52 by pvitor-l         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	is_builtin(void)
+int	is_builtin(char **args)
 {
-    t_cmd  *cmd;
-    
-    cmd = get_shell()->cmd;
-	if (!cmd || !cmd->args || !cmd->args[0])
+	if (!args || !*args || !args[0])
 		return (-1);
-	if (!ft_strcmp(cmd->args[0], "echo"))
+	if (!ft_strcmp(args[0], "echo"))
 		return (ECHO);
-	if (!ft_strcmp(cmd->args[0], "pwd"))
+	if (!ft_strcmp(args[0], "pwd"))
 		return (PWD);
-	if (!ft_strcmp(cmd->args[0], "cd"))
+	if (!ft_strcmp(args[0], "cd"))
 		return (CD);
-	if (!ft_strcmp(cmd->args[0], "env"))
+	if (!ft_strcmp(args[0], "env"))
 		return (ENV);
-	if (!ft_strcmp(cmd->args[0], "exit"))
+	if (!ft_strcmp(args[0], "export"))
+		return (EXPORT);
+	if (!ft_strcmp(args[0], "unset"))
+		return (UNSET);
+	if (!ft_strcmp(args[0], "exit"))
 		return (EXIT);
 	return (-1);
 }
 
-int exec_builtin(int code)
+int	fds_error(t_fd_backup *backup, t_cmd *cmd)
 {
-    if (code == ECHO)
-        ft_echo(get_shell()->cmd->args);
-    else if (code == PWD)
-        ft_pwd();
-    else if (code == CD)
-        ft_cd(get_shell()->cmd->args);
-    else if (code == ENV)
-        ft_env(get_shell()->cmd->args);
-    else if (code == EXIT)
-        ft_exit(get_shell()->cmd->args);
-    return (code);
+	backup_fds(backup);
+	if (redir_actions(cmd))
+	{
+		perror("");
+		restaure_for_origin_fds(backup);
+		close_fds(backup);
+		get_shell()->exit_status = 1;
+		return (-1);
+	}
+	return (0);
 }
 
-int	count_word(t_token *token)
+int	exec_builtin(int code, t_cmd *cmd)
 {
-	t_token	*temp;
-	int		count;
+	t_fd_backup	backup;
 
-	temp = token;
-	count = 0;
-	while (temp)
+	if (fds_error(&backup, cmd))
+		return (-1);
+	if (code == ECHO)
+		get_shell()->exit_status = ft_echo(cmd->args);
+	else if (code == PWD)
+		get_shell()->exit_status = ft_pwd();
+	else if (code == CD)
+		get_shell()->exit_status = ft_cd(cmd->args);
+	else if (code == ENV)
+		get_shell()->exit_status = ft_env(cmd->args);
+	else if (code == EXPORT)
+		get_shell()->exit_status = ft_export(cmd->args);
+	else if (code == UNSET)
+		get_shell()->exit_status = ft_unset(&(get_shell()->env), cmd->args);
+	else if (code == EXIT)
 	{
-		if (temp->type == TOKEN_WORD)
-			count++;
-		temp = temp->next;
+		restore_and_close(&backup);
+		get_shell()->exit_status = ft_exit(cmd->args);
+		return (get_shell()->exit_status);
 	}
-	return (count);
+	restore_and_close(&backup);
+	return (get_shell()->exit_status);
 }
 
-void	token_to_cmd(void)
+void	restore_and_close(t_fd_backup *backup)
 {
-	t_token	*temp;
-	int		i;
-	int		count;
-
-	if (!get_shell()->token)
-		return ;
-	count = count_word(get_shell()->token);
-	get_shell()->cmd = malloc(sizeof(t_cmd));
-	if (!get_shell()->cmd)
-		return ;
-	get_shell()->cmd->args = malloc(sizeof(char *) * (count + 1));
-	if (!get_shell()->cmd->args)
-	{
-		free(get_shell()->cmd);
-		get_shell()->cmd = NULL;
-		return ;
-	}
-	temp = get_shell()->token;
-	i = 0;
-	while (temp)
-	{
-		if (temp->type == TOKEN_WORD)
-		{
-			get_shell()->cmd->args[i] = ft_strdup(temp->value);
-			if (!get_shell()->cmd->args[i])
-			{
-				while (i > 0)
-					free(get_shell()->cmd->args[--i]);
-				free(get_shell()->cmd->args);
-				free(get_shell()->cmd);
-				get_shell()->cmd = NULL;
-				return ;
-			}
-			i++;
-		}
-		else
-			break ;
-		temp = temp->next;
-	}
-	get_shell()->cmd->args[i] = NULL;
-	get_shell()->cmd->next = NULL;
+	restaure_for_origin_fds(backup);
+	close_fds(backup);
 }
-
-/*
-void	token_to_cmd(t_cmd *cmd, t_token *token)
-{
-	int len_nodes;
-	t_cmd *parse_cmd;
-	t_token *current;
-
-	current = token;
-	len_nodes = count_word;
-	parse_cmd = cmd;
-	parse_cmd = malloc(sizeof(t_cmd));
-	parse_cmd->args = (char **)malloc((len_nodes + 1) * sizeof(char *));
-
-	while (current)
-	{
-		if (current == TOKEN_PIPE)
-			parse = parse->next;'
-		else if (current->type == TOKEN_WORD)
-		{
-			parse->args[i] = ft_strdup(current->value);	
-			if (
-		}
-	}
-	
-}
-*/
