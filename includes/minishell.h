@@ -6,7 +6,7 @@
 /*   By: brunogue <brunogue@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/22 14:55:53 by brunogue          #+#    #+#             */
-/*   Updated: 2025/07/15 19:16:08 by pvitor-l         ###   ########.fr       */
+/*   Updated: 2025/07/19 22:08:37 by brunogue         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,6 @@
 # include "../libft/libft.h"
 # include "struct.h"
 # include "builtin.h"
-# include "parser.h"
-# include "token.h"
 // LIBS
 # include <fcntl.h>
 # include <readline/history.h>
@@ -29,7 +27,7 @@
 # include <sys/wait.h>
 # include <unistd.h>
 
-# define AVOID_TOKENS " \t\r\v\f"
+# define AVOID_TOKENS " \t\r\v\f\n"
 # define SPECIALS_CHARS "|><\"\'"
 # define QUOTE '\''
 # define DOUBLE_QUOTE '"'
@@ -106,9 +104,9 @@ void			smart_execute(t_cmd *cmd);
 void			exec_single_command(t_cmd *cmd, char **new_env, char **path);
 
 // redirect.c
-int				process_redirect(t_cmd **cmd, t_token **token);
+int				process_redirect(t_cmd **cmd, t_token **token, char *filename);
 int				redir_actions(t_cmd *cmd);
-int				valid_file(t_token *token);
+int				valid_file(char *filename, t_cmd **cmd);
 void			restaure_for_origin_fds(t_fd_backup *backup);
 void			backup_fds(t_fd_backup *backup);
 void			close_fds(t_fd_backup *backup);
@@ -120,5 +118,11 @@ int				valid_metacharacteres(t_token *token);
 void			setup_signals(void);
 void			on_sigint(int signum);
 void			on_sigquit(int signum);
+
+// HEREDOC.C
+void			process_heredoc(t_token *current, int i);
+void			heredoc_manager(t_token *current, int fd_heredoc);
+void	exec_heredoc(char *delimiter, int quotes, int fd_heredoc);
+void			heredoc(t_token *token);
 
 #endif

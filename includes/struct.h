@@ -6,7 +6,7 @@
 /*   By: brunogue <brunogue@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 18:52:12 by brunogue          #+#    #+#             */
-/*   Updated: 2025/07/12 18:02:22 by pvitor-l         ###   ########.fr       */
+/*   Updated: 2025/07/19 18:21:42 by brunogue         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,12 @@ typedef struct s_token
 	struct s_token			*next;
 }							t_token;
 
+typedef struct s_heredoc
+{
+	char					*filename;
+	struct s_token			*next;
+}							t_heredoc;
+
 typedef struct s_cmd
 {
 	char					**args;
@@ -73,7 +79,6 @@ typedef struct s_env
 {
 	char					*name;
 	char					*content;
-	int						exported;
 	struct s_env			*next;
 }							t_env;
 

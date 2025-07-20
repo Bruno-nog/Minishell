@@ -6,7 +6,7 @@
 /*   By: brunogue <brunogue@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 15:36:10 by pvitor-l          #+#    #+#             */
-/*   Updated: 2025/07/13 16:30:36 by pvitor-l         ###   ########.fr       */
+/*   Updated: 2025/07/19 18:44:22 by brunogue         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,8 +59,8 @@ void	process_all(t_cmd **cmd, t_token **token, int *i)
 			|| (*token)->type == TOKEN_REDIR_OUT
 			|| (*token)->type == TOKEN_APPEND)
 		{
-			if (process_redirect(cmd, token))
-				cleanup_iteration();
+			if (process_redirect(cmd, token, NULL))
+				break ;
 			if (*token && (*token)->next)
 				*token = (*token)->next;
 		}
@@ -68,7 +68,6 @@ void	process_all(t_cmd **cmd, t_token **token, int *i)
 			break ;
 		*token = (*token)->next;
 	}
-	free_token_list(*token);
 }
 
 void	process_word(t_cmd **curr_cmd, t_token **token, int *i)

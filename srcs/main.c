@@ -6,13 +6,13 @@
 /*   By: brunogue <brunogue@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 18:05:18 by pvitor-l          #+#    #+#             */
-/*   Updated: 2025/07/15 19:43:14 by pvitor-l         ###   ########.fr       */
+/*   Updated: 2025/07/19 19:42:26 by brunogue         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static void	verify_input(char *input)
+int	verify_input(char *input)
 {
 	if (!input)
 	{
@@ -22,12 +22,15 @@ static void	verify_input(char *input)
 	if (*input == '\0')
 	{
 		free(input);
+		return (0);
 	}
 	if (!check_quotes(input))
 	{
 		ft_printf("used \"\" or '' don't %s\n", input);
 		free(input);
+		return (0);
 	}
+	return (1);
 }
 
 int	main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[],
@@ -42,10 +45,15 @@ int	main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[],
 	while (1)
 	{
 		input = readline("minishell> ");
-		verify_input(input);
+		if (!verify_input(input))
+			continue ;
 		add_history(input);
 		get_shell()->token = tokenization(get_shell()->token, input, NULL);
-		free(input);
+		if (!get_shell()->token)
+		{
+			cleanup_iteration();
+			continue ;
+		}
 		if (valid_metacharacteres(get_shell()->token))
 		{
 			cleanup_iteration();
@@ -53,6 +61,7 @@ int	main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[],
 			continue ;
 		}
 		handle_command(get_shell()->token);
+		heredoc(get_shell()->token);
 		smart_execute(get_shell()->cmd);
 		cleanup_iteration();
 	}
@@ -68,10 +77,8 @@ t_shell	*get_shell(void)
 
 void	init_shell(t_env *envp)
 {
-	get_shell()->input = NULL;
 	get_shell()->env = envp;
 	get_shell()->cmd = NULL;
 	get_shell()->token = NULL;
 	get_shell()->exit_status = 0;
-	get_shell()->input = NULL;
 }
