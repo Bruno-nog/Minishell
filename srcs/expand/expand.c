@@ -6,7 +6,7 @@
 /*   By: brunogue <brunogue@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 19:00:06 by brunogue          #+#    #+#             */
-/*   Updated: 2025/07/16 14:21:03 by brunogue         ###   ########.fr       */
+/*   Updated: 2025/07/23 19:50:19 by brunogue         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,35 +39,75 @@ int	verify_dollar_sign(char *arg, char **expanded)
 	return (i);
 }
 
-char	*expand_var(char *arg)
+char *expand_var(char *arg)
 {
-	char	*expanded;
-	int		i;
-	char	buffer[2];
-	int		curr_i;
+    size_t len;
+    char   *expanded;
+    int     i;
+    int     curr_i;
+    char    buffer[2];
 
-	expanded = ft_strdup("");
-	i = 0;
-	while (arg[i])
-	{
-		curr_i = verify_dollar_sign(&arg[i], &expanded);
-		if (curr_i > 0)
-			i += curr_i;
-		else
-		{
-			buffer[0] = arg[i];
-			buffer[1] = '\0';
-			expanded = append_str(expanded, buffer);
-			i++;
-		}
-	}
-	return (expanded);
+    /* 1) Se toda a string estiver entre aspas simples, devolve o literal */
+    len = ft_strlen(arg);
+    if (len >= 2 && arg[0] == '\'' && arg[len - 1] == '\'')
+    {
+        /* retorna cópia de arg sem as aspas do início e do fim */
+        return ft_substr(arg, 1, len - 2);
+    }
+
+    /* 2) Caso contrário, processa caráter por caráter */
+    expanded = ft_strdup("");
+    if (!expanded)
+        return NULL;
+    i = 0;
+    while (arg[i])
+    {
+        curr_i = verify_dollar_sign(&arg[i], &expanded);
+        if (curr_i > 0)
+        {
+            /* consumiu curr_i caracteres na expansão */
+            i += curr_i;
+        }
+        else
+        {
+            /* caractere normal, só copia para expanded */
+            buffer[0] = arg[i];
+            buffer[1] = '\0';
+            expanded = append_str(expanded, buffer);
+            i++;
+        }
+    }
+
+    return expanded;
 }
+
+// char	*expand_var(char *arg)
+// {
+// 	char	*expanded;
+// 	int		i;
+// 	char	buffer[2];
+// 	int		curr_i;
+
+// 	expanded = ft_strdup("");
+// 	i = 0;
+// 	while (arg[i])
+// 	{
+// 		curr_i = verify_dollar_sign(&arg[i], &expanded);
+// 		if (curr_i > 0)
+// 			i += curr_i;
+// 		else
+// 		{
+// 			buffer[0] = arg[i];
+// 			buffer[1] = '\0';
+// 			expanded = append_str(expanded, buffer);
+// 			i++;
+// 		}
+// 	}
+// 	return (expanded);
+// }
 
 char	*which_expand(char c)
 {
-	// if (c == '$')
-	// 	return (ft_itoa(getpid()));
 	if (c == '?')
 		return (ft_itoa(get_shell()->exit_status));
 	return (ft_strdup(""));
@@ -78,6 +118,8 @@ char	*append_str(char *dest, const char *src)
 	char	*temp;
 
 	temp = ft_strjoin(dest, src);
+	if (!temp)
+		return (NULL);
 	free(dest);
 	return (temp);
 }

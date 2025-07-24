@@ -6,27 +6,35 @@
 /*   By: brunogue <brunogue@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 18:08:53 by brunogue          #+#    #+#             */
-/*   Updated: 2025/07/19 22:07:43 by brunogue         ###   ########.fr       */
+/*   Updated: 2025/07/21 20:54:05 by pvitor-l         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	process_heredoc(t_token *current, int i)
+void	process_heredoc(t_token *current, int i, t_cmd **cmd)
 {
 	char	*filename;
 	int		fd_heredoc;
 	int		status;
 	pid_t	pid;
+	char	*pos_fix;
 
-	filename = ft_strjoin("/tmp/heredoc", ft_itoa(i));
+	pos_fix = ft_itoa(i);
+	filename = ft_strjoin("/tmp/heredoc", pos_fix);
 	fd_heredoc = open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0644);
+	if ((*cmd)->infile)
+		free((*cmd)->infile);
+	(*cmd)->infile = ft_strdup(filename);
+	free(filename);
+	free(pos_fix);
 	pid = fork();
 	if (pid == 0)
 		heredoc_manager(current, fd_heredoc);
 	if (pid > 0)
 	{
 		waitpid(pid, &status, 0);
+		close(fd_heredoc);
 	}
 }
 
@@ -37,7 +45,7 @@ int	valid_quotes_heredoc(char *delimiter)
 	i = 0;
 	while (delimiter[i])
 	{
-		if (delimiter[i] == DOUBLE_QUOTE || delimiter[i] == QUOTE)
+		if (delimiter[i] == '\"' || delimiter[i] == '\'')
 			return (1);
 		i++;
 	}
@@ -49,47 +57,37 @@ void	heredoc_manager(t_token *current, int fd_heredoc)
 	char	*delimiter;
 	int		quotes;
 
-	delimiter = current->next->value;
+	// delimiter = current->next->value;
+	delimiter = ft_strdup(current->next->value);
 	quotes = valid_quotes_heredoc(delimiter);
+	if (!delimiter)
+	{
+		close(fd_heredoc);
+		exit(1);
+	}
 	exec_heredoc(delimiter, quotes, fd_heredoc);
+	free(delimiter);
 	close(fd_heredoc);
-	exit (0);
+	free_env(get_shell()->env);
+	cleanup_iteration();
+	exit(0);
 }
 
 void	exec_heredoc(char *delimiter, int quotes, int fd_heredoc)
 {
 	char	*input;
 
-	(void)fd_heredoc;
 	while (1)
 	{
 		// signals_here()
 		input = readline("> ");
 		if (!input)
-		{
 			break ;
-		}
 		if (!ft_strcmp(input, delimiter))
 			break ;
-		if (!quotes)
+		if (quotes == 0)
 			input = expand_var(input);
-	}
-}
-
-void	heredoc(t_token *token)
-{
-	t_token	*current;
-	int		i;
-
-	i = 0;
-	current = token;
-	while (current)
-	{
-		if (current->type == TOKEN_HEREDOC && current->next->type == TOKEN_WORD)
-		{
-			process_heredoc(current, i);
-		}
-		i++;
-		current = current->next;
+		ft_putendl_fd(input, fd_heredoc);
+		free(input);
 	}
 }

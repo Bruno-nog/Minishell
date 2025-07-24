@@ -6,7 +6,7 @@
 /*   By: brunogue <brunogue@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 15:28:11 by brunogue          #+#    #+#             */
-/*   Updated: 2025/07/19 22:10:19 by brunogue         ###   ########.fr       */
+/*   Updated: 2025/07/23 20:16:07 by brunogue         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,88 +28,170 @@ t_token_type	find_token_type(char *str)
 		return (TOKEN_WORD);
 }
 
-t_token	*tokenization(t_token *token, char *input, t_token *current)
+static int is_space(char c)
 {
-	char	*value;
-	int		i;
-	int		start;
-
-	i = 0;
-	while (input[i] != '\0')
-	{
-		if (ft_avoid_tokens(input, &i))
-			continue ;
-		if (extract_redir_or_pipe(input, &i, &token, &current))
-			continue ;
-		if (handle_quotes(input, &i, &token, &current))
-			continue ;
-		start = i;
-		while (input[i] && !ft_strchr(AVOID_TOKENS, input[i])
-			&& !ft_strchr(SPECIALS_CHARS, input[i]))
-			i++;
-		if (i > start)
-		{
-			value = ft_substr(input, start, i - start);
-			append_token(&token, &current, value);
-			free(value);
-		}
-	}
-	return (token);
+	return (c == ' '  || c == '\t' || c == '\n' ||
+			c == '\v' || c == '\f' || c == '\r');
 }
 
-static int	is_space(char c)
+int handle_quotes(char *input, int *i, t_token **token, t_token **current)
 {
-	return (c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f'
-		|| c == '\r');
+    int  quote_pos;
+    char delim;
+    char *value;
+    int  end_pos;
+
+	quote_pos = *i;
+    delim = input[*i];
+    (*i)++;
+    while (input[*i] && input[*i] != delim)
+        (*i)++;
+    end_pos = *i;
+    if (input[*i] == delim)
+        (*i)++;
+    value = ft_substr(input, quote_pos, end_pos - quote_pos + 1);
+    if (*current
+        && quote_pos > 0
+        && !is_space(input[quote_pos - 1]))
+    {
+        char *joined = ft_strjoin((*current)->value, value);
+        free((*current)->value);
+        (*current)->value = joined;
+    }
+    else
+    {
+        append_token(token, current, value);
+    }
+
+    free(value);
+    return (1);
 }
 
-int	handle_quotes(char *input, int *i, t_token **token, t_token **current)
+t_token *tokenization(t_token *token, char *input, t_token *current)
 {
-	int		start;
-	char	verify_quotes;
-	char	*value;
-	char	*joined;
-	int		quote_pos;
+    int    i = 0;
+    char  *value;
+    int    start;
 
-	if (input[*i] != QUOTE && input[*i] != DOUBLE_QUOTE)
-		return (0);
-	verify_quotes = input[*i];
-	quote_pos = (*i)++;
-	start = *i;
-	while (input[*i] && input[*i] != verify_quotes)
-		(*i)++;
-	value = ft_substr(input, start, *i - start);
-	if (*current && quote_pos > 0 && !is_space(input[quote_pos - 1]))
-	{
-		joined = ft_strjoin((*current)->value, value);
-		free((*current)->value);
-		(*current)->value = joined;
-	}
-	else
-		append_token(token, current, value);
-	free(value);
-	if (input[*i] == verify_quotes)
-		(*i)++;
-	return (1);
+    while (input[i])
+    {
+        if (ft_avoid_tokens(input, &i))
+            continue;
+        if (extract_redir_or_pipe(input, &i, &token, &current))
+            continue;
+        if (input[i] == '\'' || input[i] == '\"')
+        {
+            handle_quotes(input, &i, &token, &current);
+            continue;
+        }
+        start = i;
+        while (input[i]
+               && !ft_strchr(AVOID_TOKENS,   input[i])
+               && !ft_strchr(SPECIALS_CHARS, input[i]))
+            i++;
+        if (i > start)
+        {
+            value = ft_substr(input, start, i - start);
+            append_token(&token, &current, value);
+            free(value);
+        }
+    }
+    return (token);
 }
+
+
+
+
+
+
+
+// t_token	*tokenization(t_token *token, char *input, t_token *current)
+// {
+// 	char	*value;
+// 	int		i;
+// 	int		start;
+
+// 	i = 0;
+// 	while (input[i] != '\0')
+// 	{
+// 		if (ft_avoid_tokens(input, &i))
+// 			continue ;
+// 		if (extract_redir_or_pipe(input, &i, &token, &current))
+// 			continue ;
+// 		if (current && current->type != TOKEN_HEREDOC)
+// 		{
+// 			if (handle_quotes(input, &i, &token, &current))
+// 				continue ;
+// 		}
+// 		start = i;
+// 		while ((input[i] && !ft_strchr(AVOID_TOKENS, input[i])
+// 				&& !ft_strchr(SPECIALS_CHARS, input[i])) || (input[i] && current
+// 				&& current->type == TOKEN_HEREDOC))
+// 			i++;
+// 		if (i > start)
+// 		{
+// 			value = ft_substr(input, start, i - start);
+// 			append_token(&token, &current, value);
+// 			free(value);
+// 		}
+// 	}
+// 	return (token);
+// }
+
+// static int	is_space(char c)
+// {
+// 	return (c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f'
+// 		|| c == '\r');
+// }
+
+
+// int	handle_quotes(char *input, int *i, t_token **token, t_token **current)
+// {
+// 	int		start;
+// 	char	verify_quotes;
+// 	char	*value;
+// 	char	*joined;
+// 	int		quote_pos;
+
+// 	if (input[*i] != QUOTE && input[*i] != DOUBLE_QUOTE)
+// 		return (0);
+// 	verify_quotes = input[*i];
+// 	quote_pos = (*i)++;
+// 	start = *i;
+// 	while (input[*i] && input[*i] != verify_quotes)
+// 		(*i)++;
+// 	value = ft_substr(input, start, *i - start);
+// 	if (*current && quote_pos > 0 && !is_space(input[quote_pos - 1]))
+// 	{
+// 		joined = ft_strjoin((*current)->value, value);
+// 		free((*current)->value);
+// 		(*current)->value = joined;
+// 	}
+// 	else
+// 		append_token(token, current, value);
+// 	free(value);
+// 	if (input[*i] == verify_quotes)
+// 		(*i)++;
+// 	return (1);
+// }
 
 void	append_token(t_token **token, t_token **current, char *value)
 {
-    t_token *new;
+	t_token	*new;
 
-    new = malloc(sizeof(t_token));
-    if (!new)
-        return;
-    new->value = ft_strdup(value);
-    if (!new->value)
-        return;
-    new->type = find_token_type(value);
-    new->next = NULL;
-    if (*token == NULL)
-        *token = new;
-    else
-        (*current)->next = new;
-    *current = new;
+	new = malloc(sizeof(t_token));
+	if (!new)
+		return ;
+	new->value = ft_strdup(value);
+	if (!new->value)
+		return ;
+	new->type = find_token_type(value);
+	new->next = NULL;
+	if (*token == NULL)
+		*token = new;
+	else
+		(*current)->next = new;
+	*current = new;
 }
 
 void	ft_print_token(t_token *list)
