@@ -6,7 +6,7 @@
 /*   By: brunogue <brunogue@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 15:28:11 by brunogue          #+#    #+#             */
-/*   Updated: 2025/07/23 20:16:07 by brunogue         ###   ########.fr       */
+/*   Updated: 2025/07/27 14:48:21 by brunogue         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,10 +36,11 @@ static int is_space(char c)
 
 int handle_quotes(char *input, int *i, t_token **token, t_token **current)
 {
-    int  quote_pos;
-    char delim;
-    char *value;
-    int  end_pos;
+    int		quote_pos;
+    char	delim;
+    char	*value;
+    int		end_pos;
+    char	*joined;
 
 	quote_pos = *i;
     delim = input[*i];
@@ -50,29 +51,27 @@ int handle_quotes(char *input, int *i, t_token **token, t_token **current)
     if (input[*i] == delim)
         (*i)++;
     value = ft_substr(input, quote_pos, end_pos - quote_pos + 1);
-    if (*current
-        && quote_pos > 0
-        && !is_space(input[quote_pos - 1]))
+    if (*current && quote_pos > 0 
+		&& !is_space(input[quote_pos - 1]))
     {
-        char *joined = ft_strjoin((*current)->value, value);
+        joined = ft_strjoin((*current)->value, value);
         free((*current)->value);
         (*current)->value = joined;
     }
     else
-    {
         append_token(token, current, value);
-    }
-
     free(value);
     return (1);
 }
 
 t_token *tokenization(t_token *token, char *input, t_token *current)
 {
-    int    i = 0;
-    char  *value;
-    int    start;
+	char	*value;
+    int		start;
+    int		i;
 
+    i = 0;
+    // get_shell()->has_quotes_or_not = 0;
     while (input[i])
     {
         if (ft_avoid_tokens(input, &i))
@@ -81,6 +80,7 @@ t_token *tokenization(t_token *token, char *input, t_token *current)
             continue;
         if (input[i] == '\'' || input[i] == '\"')
         {
+            // get_shell()->has_quotes_or_not = 1;
             handle_quotes(input, &i, &token, &current);
             continue;
         }
