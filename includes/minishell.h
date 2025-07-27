@@ -6,7 +6,7 @@
 /*   By: brunogue <brunogue@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/22 14:55:53 by brunogue          #+#    #+#             */
-/*   Updated: 2025/07/24 19:43:50 by brunogue         ###   ########.fr       */
+/*   Updated: 2025/07/27 18:28:37 by brunogue         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,8 @@
 
 // INCLUDES
 # include "../libft/libft.h"
-# include "struct.h"
 # include "builtin.h"
+# include "struct.h"
 // LIBS
 # include <fcntl.h>
 # include <readline/history.h>
@@ -72,7 +72,7 @@ char			**recreate_env(t_env *env);
 int				count_nodes(t_env *env);
 
 // global_exection.c
-void			exec_all(t_cmd *cmd);
+void			exec_all(t_cmd *cmd, t_env *envp);
 void			exec_external(t_cmd *cmd, char **env, char **path);
 
 void			expand_all_args(t_cmd *cmd);
@@ -120,7 +120,7 @@ int				valid_metacharacteres(t_token *token);
 // SIGNALS.C
 void			setup_signals(void);
 void			on_sigint(int signum);
-void			on_sigquit(int signum);
+void			set_std_cmd(void);
 
 // HEREDOC.C
 void			process_heredoc(t_token *current, int i, t_cmd **cmd);
@@ -128,5 +128,7 @@ void			heredoc_manager(t_token *current, int fd_heredoc);
 void			exec_heredoc(char *delimiter, int quotes, int fd_heredoc);
 void			heredoc(t_token *token);
 void			close_all(void);
+void			handle_heredoc_sigint(int sig);
+void			signals_heredoc(void);
 
 #endif
