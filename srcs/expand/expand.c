@@ -6,7 +6,7 @@
 /*   By: brunogue <brunogue@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 19:00:06 by brunogue          #+#    #+#             */
-/*   Updated: 2025/07/27 18:33:41 by brunogue         ###   ########.fr       */
+/*   Updated: 2025/07/28 19:42:38 by brunogue         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,120 +39,63 @@ int	verify_dollar_sign(char *arg, char **expanded)
 	return (i);
 }
 
-int ternary(int condition, int true_val, int false_val)
+static int	try_handle_dollar(char *arg, int *i, char **expanded)
 {
-    if (condition)
-        return true_val;
-    return false_val;
+	int	consumed;
+
+	consumed = verify_dollar_sign(&arg[*i], expanded);
+	if (consumed > 0)
+	{
+		*i += consumed;
+		return (1);
+	}
+	return (0);
 }
 
-char *expand_var(char *arg)
+static char	*append_literal(char *expanded, const char *arg, int *i)
 {
-    char   *expanded;
-    int     in_quotes;
-    int     i;
-    int     consumed;
-    char    buffer[2];
+	char	buf[2];
+
+	buf[0] = arg[*i];
+	buf[1] = '\0';
+	(*i)++;
+	return (append_str(expanded, buf));
+}
+
+static int	handle_quote_change(char c, t_qmode *in_quotes, int *i)
+{
+	t_qmode	new_q;
+
+	new_q = toggle_quote(c, *in_quotes);
+	if (new_q != *in_quotes)
+	{
+		*in_quotes = new_q;
+		(*i)++;
+		return (1);
+	}
+	return (0);
+}
+
+char	*expand_var(char *arg, char *expanded)
+{
+	t_qmode	in_quotes;
+	int		i;
 
 	i = 0;
-	in_quotes = 0;
-    expanded = ft_strdup("");
-    if (!expanded)
-        return NULL;
-    while (arg[i])
-    {
-        if (arg[i] == QUOTE && in_quotes != 2)
-        {
-            in_quotes = ternary(in_quotes == 1, 0, 1);
-            i++;
-        }
-        else if (arg[i] == DOUBLE_QUOTE && in_quotes != 1)
-        {
-            in_quotes = ternary(in_quotes == 2, 0, 2);
-            i++;
-        }
-        else if (arg[i] == '$' && in_quotes != 1)
-        {
-            consumed = verify_dollar_sign(&arg[i], &expanded);
-            if (consumed > 0)
-                i += consumed;
-            else
-            {
-                buffer[0] = arg[i++];
-                buffer[1] = '\0';
-                expanded = append_str(expanded, buffer);
-            }
-        }
-        else
-        {
-            buffer[0] = arg[i++];
-            buffer[1] = '\0';
-            expanded = append_str(expanded, buffer);
-        }
-    }
-    return expanded;
-}
-
-
-// char	*expand_var(char *arg)
-// {
-// 	char	*expanded;
-// 	int		i;
-// 	char	buffer[2];
-// 	int		curr_i;
-
-// 	expanded = ft_strdup("");
-// 	i = 0;
-// 	while (arg[i])
-// 	{
-// 		curr_i = verify_dollar_sign(&arg[i], &expanded);
-// 		if (curr_i > 0)
-// 			i += curr_i;
-// 		else
-// 		{
-// 			buffer[0] = arg[i];
-// 			buffer[1] = '\0';
-// 			expanded = append_str(expanded, buffer);
-// 			i++;
-// 		}
-// 	}
-// 	return (expanded);
-// }
-
-char	*which_expand(char c)
-{
-	if (c == '?')
-		return (ft_itoa(get_shell()->exit_status));
-	return (ft_strdup(""));
-}
-
-char	*append_str(char *dest, const char *src)
-{
-	char	*temp;
-
-	temp = ft_strjoin(dest, src);
-	if (!temp)
+	in_quotes = QUOTE_NONE;
+	expanded = ft_strdup("");
+	if (!expanded)
 		return (NULL);
-	free(dest);
-	return (temp);
-}
-
-char	*expand_env(char *arg, int *i, t_env *env)
-{
-	char	*name;
-	char	*value;
-	int		start;
-	int		len;
-
-	start = *i + 1;
-	len = 0;
-	while (ft_isalnum(arg[start + len]) || arg[start + len] == '_')
-		len++;
-	name = ft_substr(arg, start, len);
-	value = get_env_value(env, name);
-	free(name);
-	*i = start + len;
-	if (value)
-		return (ft_strdup(value));
-	return (ft_strdup(""));
+	while (arg[i])
+	{
+		if (handle_quote_change(arg[i], &in_quotes, &i))
+			continue ;
+		if (arg[i] == '$' && in_quotes != QUOTE_SINGLE)
+		{
+			if (try_handle_dollar(arg, &i, &expanded))
+				continue ;
+		}
+		expanded = append_literal(expanded, arg, &i);
+	}
+	return (expanded);
 }

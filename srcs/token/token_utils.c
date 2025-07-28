@@ -6,11 +6,20 @@
 /*   By: brunogue <brunogue@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 17:54:27 by brunogue          #+#    #+#             */
-/*   Updated: 2025/07/15 19:30:01 by pvitor-l         ###   ########.fr       */
+/*   Updated: 2025/07/28 20:04:07 by brunogue         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+// int	ft_avoid_tokens(char *input, int *i)
+// {
+// 	while (input[*i] && ft_strchr(AVOID_TOKENS, input[*i]))
+// 		(*i)++;
+// 	if (input[*i] == '\0')
+// 		return (1);
+// 	return (0);
+// }
 
 int	ft_avoid_tokens(char *input, int *i)
 {
@@ -18,26 +27,57 @@ int	ft_avoid_tokens(char *input, int *i)
 		(*i)++;
 	if (input[*i] == '\0')
 		return (1);
+	if ((input[*i] == DOUBLE_QUOTE && input[*i + 1] == DOUBLE_QUOTE)
+		|| (input[*i] == QUOTE && input[*i + 1] == QUOTE))
+	{
+		*i += 2;
+		return (1);
+	}
 	return (0);
 }
 
-int	extract_redir_or_pipe(char *input, int *i, t_token **token,
+static void	extract_redir_value(char *input, int *i, t_token **token,
 		t_token **current)
 {
 	int		start;
 	char	*value;
 
-	if (input[*i] == '|' || input[*i] == '<' || input[*i] == '>')
+	start = *i;
+	if ((input[*i] == '<' && input[*i + 1] == '<') || (input[*i] == '>'
+			&& input[*i + 1] == '>'))
+		*i += 2;
+	else
+		(*i)++;
+	value = ft_substr(input, start, *i - start);
+	append_token(token, current, value);
+	free(value);
+}
+
+static void	extract_redir_target(char *input, int *i, t_token **token,
+		t_token **current)
+{
+	int		start;
+	char	*value;
+
+	if (input[*i] && !is_space(input[*i]) && !ft_strchr(AVOID_TOKENS, input[*i])
+		&& !ft_strchr(SPECIALS_CHARS, input[*i]))
 	{
 		start = *i;
-		if ((input[*i] == '<' && input[*i + 1] == '<') || (input[*i] == '>'
-				&& input[*i + 1] == '>'))
-			*i += 2;
-		else
+		while (input[*i] && !is_space(input[*i]) && !ft_strchr(AVOID_TOKENS,
+				input[*i]) && !ft_strchr(SPECIALS_CHARS, input[*i]))
 			(*i)++;
 		value = ft_substr(input, start, *i - start);
 		append_token(token, current, value);
 		free(value);
+	}
+}
+
+int	redir_or_pipe(char *inp, int *i, t_token **tok, t_token **cur)
+{
+	if (inp[*i] == '|' || inp[*i] == '<' || inp[*i] == '>')
+	{
+		extract_redir_value(inp, i, tok, cur);
+		extract_redir_target(inp, i, tok, cur);
 		return (1);
 	}
 	return (0);

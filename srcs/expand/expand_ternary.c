@@ -1,41 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   echo.c                                             :+:      :+:    :+:   */
+/*   expand_binary.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: brunogue <brunogue@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/06/04 17:48:17 by brunogue          #+#    #+#             */
-/*   Updated: 2025/07/28 15:53:48 by brunogue         ###   ########.fr       */
+/*   Created: 2025/07/28 19:40:08 by brunogue          #+#    #+#             */
+/*   Updated: 2025/07/28 19:41:31 by brunogue         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	ft_echo(char **args)
+int	ternary(int condition, int true_val, int false_val)
 {
-	int		i;
-	int		n_flag;
-	char	*expanded;
+	if (condition)
+		return (true_val);
+	return (false_val);
+}
 
-	i = 1;
-	expanded = NULL;
-	n_flag = 0;
-	if (args[1] && !ft_strcmp(args[1], "-n"))
-	{
-		n_flag = 1;
-		i++;
-	}
-	while (args[i])
-	{
-		expanded = expand_var(args[i], expanded);
-		ft_putstr_fd(expanded, 1);
-		if (args[i + 1])
-			ft_putstr_fd(" ", 1);
-		free(expanded);
-		i++;
-	}
-	if (!n_flag)
-		ft_putstr_fd("\n", 1);
-	return (0);
+t_qmode	toggle_quote(char c, t_qmode in_quotes)
+{
+	if (c == QUOTE && in_quotes != QUOTE_DOUBLE)
+		return (ternary(in_quotes == QUOTE_SINGLE, QUOTE_NONE, QUOTE_SINGLE));
+	if (c == DOUBLE_QUOTE && in_quotes != QUOTE_SINGLE)
+		return (ternary(in_quotes == QUOTE_DOUBLE, QUOTE_NONE, QUOTE_DOUBLE));
+	return (in_quotes);
 }

@@ -6,7 +6,7 @@
 /*   By: brunogue <brunogue@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 18:52:12 by brunogue          #+#    #+#             */
-/*   Updated: 2025/07/27 18:28:20 by brunogue         ###   ########.fr       */
+/*   Updated: 2025/07/28 18:47:26 by pvitor-l         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # include "builtin.h"
 # include "minishell.h"
+# include <stdbool.h>
 
 typedef struct s_token		t_token;
 
@@ -56,10 +57,18 @@ typedef enum e_token_type
 	TOKEN_EOF,
 }							t_token_type;
 
+typedef enum e_quotemode
+{
+	QUOTE_NONE = 0,
+	QUOTE_SINGLE = 1,
+	QUOTE_DOUBLE = 2
+}							t_qmode;
+
 typedef struct s_token
 {
 	t_token_type			type;
 	char					*value;
+	bool					no_expand;
 	struct s_token			*next;
 }							t_token;
 

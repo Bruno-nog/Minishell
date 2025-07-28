@@ -1,11 +1,12 @@
-/* ************************************************************************** */ /*                                                                            */
+/* ************************************************************************** */
+/*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   command.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: brunogue <brunogue@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 15:36:10 by pvitor-l          #+#    #+#             */
-/*   Updated: 2025/07/27 17:03:46 by pvitor-l         ###   ########.fr       */
+/*   Updated: 2025/07/28 17:53:47 by pvitor-l         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,10 +50,11 @@ t_cmd	*create_cmd_node(t_token *token)
 	new_cmd->outfile = NULL;
 	new_cmd->next = NULL;
 	new_cmd->append_mode = 0;
-	new_cmd->args = (char **)ft_calloc((word_count + 1), sizeof(char *));
+	new_cmd->args = ft_calloc((word_count + 1), sizeof(char *));
 	if (!new_cmd->args)
 	{
 		free(new_cmd);
+		cleanup_iteration();
 		return (NULL);
 	}
 	return (new_cmd);
@@ -76,7 +78,7 @@ void	process_all(t_cmd **cmd, t_token **to, int *i)
 			|| (*to)->type == TOKEN_APPEND)
 		{
 			if (process_redirect(cmd, to, (*to)->next->value))
-				break ;
+				get_shell()->exit_status = 1;
 			if (*to && (*to)->next)
 				*to = (*to)->next;
 		}

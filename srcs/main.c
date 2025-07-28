@@ -6,7 +6,7 @@
 /*   By: brunogue <brunogue@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 18:05:18 by pvitor-l          #+#    #+#             */
-/*   Updated: 2025/07/27 19:06:41 by brunogue         ###   ########.fr       */
+/*   Updated: 2025/07/28 18:50:49 by pvitor-l         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ int	main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[],
 	init_shell(new_envp);
 	while (1)
 	{
+		signals_ctrl_c();
 		input = readline("minishell> ");
 		add_history(input);
 		if (!verify_input(input))
