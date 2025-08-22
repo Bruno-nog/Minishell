@@ -83,7 +83,7 @@ Para sair do shell, use `exit` (builtin) ou `Ctrl+D` (EOF).
 **Exemplo combinado:**
 
 ```sh
-minishell$ grep TODO < source.c | sort | uniq > todos.txt
+minishell> grep TODO < source.c | sort > todos.txt
 ```
 
 ## Sinais
