@@ -18,8 +18,6 @@ minishell é uma implementação simples de um interpretador de comandos (shell)
 * [Exemplos de execução](#exemplos-de-execução)
 * [Estrutura do projeto](#estrutura-do-projeto)
 * [Testes / Casos de uso](#testes--casos-de-uso)
-* [Limitações conhecidas](#limitações-conhecidas)
-* [Como contribuir](#como-contribuir)
 * [Autores](#autores)
 
 ---
@@ -75,7 +73,6 @@ Para sair do shell, use `exit` (builtin) ou `Ctrl+D` (EOF).
 * `env` — mostra variáveis de ambiente
 * `exit [n]` — encerra o shell com código `n`
 
-**Observações:** documente o comportamento exato (por exemplo, tratamento de `export` sem argumentos) conforme a implementação.
 
 ## Pipes e redirecionamentos
 
@@ -94,7 +91,6 @@ minishell$ grep TODO < source.c | sort | uniq > todos.txt
 * `SIGINT (Ctrl+C)`: deve interromper o processo em execução e retornar ao prompt sem fechar o minishell.
 * `SIGQUIT (Ctrl+\)`: comportamento pode variar — normalmente ignorado no prompt.
 
-Explique claramente como o shell responde a sinais enquanto: 1) no prompt, 2) durante execução de comandos filhos.
 
 ## Exemplos de execução
 
@@ -137,31 +133,12 @@ minishell/
 └── README.md
 ```
 
-Adapte a árvore ao layout real do seu repositório.
-
 ## Testes / Casos de uso
 
 * Teste simples: executar `ls`, `echo`, `pwd`.
 * Teste de pipes: `ls -la | grep minishell | wc -l`.
 * Teste de redirecionamento: `echo "hi" > file && cat < file`.
 * Teste de heredoc com variáveis e sem variáveis.
-* Teste de sinais: pressione `Ctrl+C` durante um comando demorado (por exemplo `sleep 10`) e verifique comportamento.
-
-Inclua scripts automatizados (bash) para rodar casos repetíveis.
-
-## Limitações conhecidas
-
-* Completa interpretação de quotes/escape pode estar incompleta (ex.: nested quotes)
-* Globbing (`*`, `?`) não implementado por padrão (ou implementado parcialmente)
-* Tratamento complexo de heredoc e expansão pode não seguir 100% o comportamento de bash
-* Execução de builtins em pipeline: dependendo da implementação, builtins podem rodar em subprocessos — documente o comportamento
-
-## Como contribuir
-
-1. Fork o repositório
-2. Crie uma branch: `git checkout -b feature/nome-da-feature`
-3. Faça commits pequenos e claros
-4. Abra um pull request descrevendo mudanças
 
 ## Autores
 
